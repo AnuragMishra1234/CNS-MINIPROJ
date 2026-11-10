@@ -1,0 +1,108 @@
+******************************************************************************
+DEMO ONLY - dummy data, local files only - BCS703 CNS Lab
+******************************************************************************
+Timestamp : 2026-11-10 23:31:02
+OS        : Windows 10 (AMD64)
+Python    : 3.11.9
+Work Dir  : cns_hash_demo/ (local demo files only)
+
+==============================================================================
+SHA-256 HASH TABLE (CHUNKED FILE READING: 4096 BYTES/CHUNK)
+==============================================================================
+File Name              | Size (B) | Len | SHA-256 Digest (64 hex chars)
+------------------------------------------------------------------------------
+sample.txt             |       25 |  64 | 8bb20bacc7507165142b144e3d7c327347393548f8002884136cc0b549a3d522
+sample_copy.txt        |       25 |  64 | 8bb20bacc7507165142b144e3d7c327347393548f8002884136cc0b549a3d522
+sample_tampered.txt    |       25 |  64 | ca815d8914c5c56b550e7e572a27894b4253dcb44fc68abe3ecda042ca046c8f
+sample_big.txt         |     5200 |  64 | 5f13aa4c6585e19ff1af6f8e365b7ccfa9123a935541bb3fce15cf8a67ea0ac5
+
+==============================================================================
+TEST 1: UNCHANGED COPY (NORMAL INTEGRITY CHECK)
+==============================================================================
+sample.txt      : 8bb20bacc7507165142b144e3d7c327347393548f8002884136cc0b549a3d522
+sample_copy.txt : 8bb20bacc7507165142b144e3d7c327347393548f8002884136cc0b549a3d522
+Result          : [PASS] Hashes MATCH.
+Explanation     : Because both files contain identical bytes, SHA-256
+                  produces the exact same 256-bit fingerprint.
+
+==============================================================================
+TEST 2: TAMPERED COPY (NEGATIVE / CHANGE DETECTION TEST)
+==============================================================================
+sample.txt          : 8bb20bacc7507165142b144e3d7c327347393548f8002884136cc0b549a3d522
+sample_tampered.txt : ca815d8914c5c56b550e7e572a27894b4253dcb44fc68abe3ecda042ca046c8f
+Result              : [PASS] Hashes DIFFER.
+Explanation         : Changing just 'lab' -> 'Lab' (1 character, 1 bit)
+                      produces a completely different SHA-256 hash,
+                      immediately exposing that the copy was modified.
+
+==============================================================================
+TEST 3: CHECKSUM FILE & VERIFICATION FUNCTION (verify_file)
+==============================================================================
+Saved checksum file : sample.txt.sha256
+Stored content      : 8bb20bacc7507165142b144e3d7c327347393548f8002884136cc0b549a3d522  sample.txt
+
+verify_file(sample.txt)          -> OK
+verify_file(sample_tampered.txt) -> INTEGRITY FAILED
+Result                           : [PASS] Verification works as expected.
+Explanation : verify_file() recomputes SHA-256 and checks it against
+              sample.txt.sha256: original returns OK, tampered fails.
+
+==============================================================================
+TEST 4: AVALANCHE EFFECT (1-CHARACTER CHANGE -> ~50% BITS FLIP)
+==============================================================================
+Input change: 'This is a CNS lab sample.' -> 'This is a CNS Lab sample.'
+ASCII change: 'l' (0x6C = 01101100) -> 'L' (0x4C = 01001100) [1 bit flipped]
+
+Original : 8bb20bacc7507165142b144e3d7c327347393548f8002884136cc0b549a3d522
+Tampered : ca815d8914c5c56b550e7e572a27894b4253dcb44fc68abe3ecda042ca046c8f
+Diff Map : ^^^^^^^^^^^^^^ ^^^^^^^^^^^^^^^^^ ^^^^^^^^^^^^^^^^^^^^ ^^^^^^^^^^  ('^' = char differs)
+
+Differing hex chars : 61 / 64 (95.31%)
+Differing bits      : 127 / 256 (49.61%)
+Result              : [PASS] Strong avalanche effect observed.
+
+==============================================================================
+TEST 5: FIXED OUTPUT LENGTH (SIZE INDEPENDENCE)
+==============================================================================
+sample.txt     (   25 bytes) -> length 64 hex chars (256 bits)
+sample_big.txt ( 5200 bytes) -> length 64 hex chars (256 bits)
+Result : [PASS] Both digests have exact fixed length of 64 hex chars.
+
+==============================================================================
+TEST 6: DETERMINISM (REPEATABLE OUTPUT)
+==============================================================================
+Run 1 : 8bb20bacc7507165142b144e3d7c327347393548f8002884136cc0b549a3d522
+Run 2 : 8bb20bacc7507165142b144e3d7c327347393548f8002884136cc0b549a3d522
+Run 3 : 8bb20bacc7507165142b144e3d7c327347393548f8002884136cc0b549a3d522
+Result: [PASS] All 3 runs produced identical SHA-256 digests.
+
+==============================================================================
+BONUS DEMO: HMAC-SHA256 (INTEGRITY + AUTHENTICITY)
+==============================================================================
+Fake Demo Key (NOT REAL) : demo-key-not-real
+HMAC(sample.txt)         : c9c95c63951ae8be200292c6c1b09b1d3987a9f511921813837852d2e6f07402
+HMAC(sample_tampered)    : 46186b53275509222c02dd25720dde4aeb60f03c92c1c5e63edb71bcd520f2bc
+compare_digest(orig, orig)     : True (Authentic & intact)
+compare_digest(orig, tampered) : False (Tampering rejected)
+Result : [PASS] HMAC verified intact file and rejected tampered copy.
+
+Why HMAC matters:
+  - Plain SHA-256 proves INTEGRITY only: anyone can modify a file AND
+    recompute a matching .sha256 checksum.
+  - HMAC-SHA256 proves INTEGRITY + AUTHENTICITY: without the secret key,
+    an attacker cannot forge a valid HMAC tag for a modified file.
+
+==============================================================================
+CONCEPT CHECK: HASHING vs ENCRYPTION (FOR VIVA)
+==============================================================================
+Hashing (e.g., SHA-256)  : One-way (irreversible), no secret key needed,
+                           fixed 256-bit output -> guarantees INTEGRITY.
+Encryption (e.g., AES)   : Two-way (reversible with decryption key),
+                           output grows with input -> guarantees CONFIDENTIALITY.
+
+==============================================================================
+FINAL RUN STATUS
+==============================================================================
+Overall Result : ALL TESTS PASSED (7/7)
+Saved Output   : results\demo_output.txt
+Saved Summary  : results\summary_table.md

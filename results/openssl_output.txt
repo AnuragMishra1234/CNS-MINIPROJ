@@ -1,0 +1,27 @@
+DEMO ONLY - dummy data, local files only - BCS703 CNS Lab
+==============================================================================
+LOCAL OPENSSL & NATIVE OS HASH COMMAND OUTPUTS
+==============================================================================
+
+--- 1. OpenSSL Check ---
+Command: openssl version / openssl dgst -sha256 ...
+Status : SKIPPED - 'openssl' is not installed on this system (per Safety Rule 4, nothing was downloaded or installed).
+
+--- 2. Native Windows PowerShell Equivalent (Get-FileHash) ---
+Command: Get-FileHash -Algorithm SHA256 sample.txt
+Algorithm Hash                                                             Path                                     
+--------- ----                                                             ----                                     
+SHA256    8BB20BACC7507165142B144E3D7C327347393548F8002884136CC0B549A3D522 E:\cns-mini-proj\cns_hash_demo\sample.txt
+
+Command: Get-FileHash -Algorithm SHA256 sample_tampered.txt
+Algorithm Hash                                                             Path                                              
+--------- ----                                                             ----                                              
+SHA256    CA815D8914C5C56B550E7E572A27894B4253DCB44FC68ABE3ECDA042CA046C8F E:\cns-mini-proj\cns_hash_demo\sample_tampered.txt
+
+--- 3. Cross-Check Against Python hash_demo.py Output ---
+Python SHA-256 (sample.txt)              : 8bb20bacc7507165142b144e3d7c327347393548f8002884136cc0b549a3d522
+PowerShell Get-FileHash (sample.txt)     : 8bb20bacc7507165142b144e3d7c327347393548f8002884136cc0b549a3d522
+sample.txt Match (case-insensitive)      : True
+Python SHA-256 (sample_tampered.txt)     : ca815d8914c5c56b550e7e572a27894b4253dcb44fc68abe3ecda042ca046c8f
+PowerShell Get-FileHash (tampered)       : ca815d8914c5c56b550e7e572a27894b4253dcb44fc68abe3ecda042ca046c8f
+sample_tampered Match (case-insensitive) : True
